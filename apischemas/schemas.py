@@ -1,5 +1,6 @@
 
 from datetime import date, datetime
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -32,6 +33,7 @@ class SymbolsCorrelationResult(BaseModel):
 
 
 class FittedLPPLModelParameters(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     tc: float
     m: float
     omega: float
@@ -49,3 +51,16 @@ class LPPLCrashModelResult(BaseModel):
     estimated_crash_date: date
     estimated_crash_time: datetime
     model_parameters: FittedLPPLModelParameters
+
+
+class S3UploadResponse:
+    model_config = ConfigDict(from_attributes=True)
+    filename: str
+    url: str
+    boto3_response: dict[str, Any]
+
+
+class PlotResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    plot: S3UploadResponse
+    spreadsheet: S3UploadResponse

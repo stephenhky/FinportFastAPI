@@ -19,7 +19,9 @@ from helpers.data import waiting_get_yahoofinance_data
 from helpers.utils import generate_timestr_filename
 from helpers.plots import plot_from_dataframe, get_optimal_daybreaks
 from helpers.aws import copy_file_to_s3
-from apischemas.schemas import SymbolEstimationResult, SymbolsCorrelationResult, LPPLCrashModelResult, FittedLPPLModelParameters
+from apischemas.schemas import (SymbolEstimationResult, SymbolsCorrelationResult,
+                                LPPLCrashModelResult, FittedLPPLModelParameters,
+                                PlotResponse)
 
 
 # load additional environment variables
@@ -227,3 +229,11 @@ def plot_moving_averages(
         public_s3_bucket,
         f"{timestr_filename}.xlsx"
     )
+
+    return PlotResponse(
+        plot=plot_response,
+        spreadsheet=excel_response
+    )
+
+
+# plot price + dividend

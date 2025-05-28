@@ -1,16 +1,11 @@
 
-from dataclasses import dataclass
-from typing import Union, Any
+from typing import Union
 from os import PathLike
 
 import boto3
 
+from apischemas.schemas import S3UploadResponse
 
-@dataclass
-class S3UploadResponse:
-    filename: str
-    url: str
-    boto3_response: dict[str, Any]
 
 
 def copy_file_to_s3(
