@@ -1,0 +1,27 @@
+
+from dataclasses import dataclass
+from typing import Union, Any
+from os import PathLike
+
+import boto3
+
+
+@dataclass
+class S3UploadResponse:
+    filename: str
+    url: str
+    boto3_response: dict[str, Any]
+
+
+def copy_file_to_s3(
+        filepath: Union[PathLike, str],
+        s3_bucket: str,
+        target_filename: str
+) -> S3UploadResponse:
+    s3_client = boto3.client("s3")
+    response = s3_client.upload_file(filepath, s3_bucket, target_filename)
+    return S3UploadResponse(
+        filename=filepath if isinstance(filepath, str) else filepath.as_posix(),
+        url=f"https://{s3_bucket}.s3.amazonaws.com/{target_filename}",
+        boto3_response=response
+    )
