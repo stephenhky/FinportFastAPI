@@ -2,16 +2,19 @@
 import logging
 from math import sqrt
 from datetime import datetime, timedelta
+from typing import Union
 
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI
 from finsim.estimate.fit import fit_BlackScholesMerton_model, fit_multivariate_BlackScholesMerton_model
 from finsim.estimate.risk import estimate_downside_risk, estimate_upside_risk, estimate_beta
+from finsim.tech.ma import get_movingaverage_price_data
 from lppl.fit import LPPLModel
 from dotenv import load_dotenv
 
 from helpers.data import waiting_get_yahoofinance_data
+from helpers.plots import plot_from_dataframe, get_optimal_daybreaks
 from apischemas.schemas import SymbolEstimationResult, SymbolsCorrelationResult, LPPLCrashModelResult, FittedLPPLModelParameters
 
 
@@ -150,4 +153,47 @@ def predict_crash(
         estimated_crash_date=pd.Timestamp.fromtimestamp(model_parameters['tc']).strftime('%Y-%m-%d'),
         estimated_crash_time=str(pd.Timestamp.fromtimestamp(model_parameters['tc'])),
         model_parameters=FittedLPPLModelParameters(**model_parameters)
+    )
+
+
+@app.get("/v0/plot-ma", response_model=None)
+def plot_moving_averages(
+        symbol: str,
+        startdate: str,
+        enddate: str,
+        dayswindow: Union[int, list[int]],
+        plottitle: str=None
+):
+    df = waiting_get_yahoofinance_data(symbol, startdate, enddate)
+    if isinstance(dayswindow, int):
+        dayswindow = [dayswindow]
+    madfs = {
+        daywindow: get_movingaverage_price_data(symbol, startdate, enddate, daywindow)
+        for daywindow in dayswindow
+    }
+    # convert dataframe for plotting using plotnine
+    plotdf = pd.DataFrame({
+        'TimeStamp': df['TimeStamp'],
+        'value': df['Close'],
+        'plot': 'price'
+    })
+    for daywindow, madf in madfs.items():
+        plotdf = pd.concat([
+            plotdf,
+            pd.DataFrame({
+                'TimeStamp': madf['TimeStamp'],
+                'value': madf['MA'],
+                'plot': f'{daywindow}-day MA'
+            })
+        ])
+
+    # plot
+    plot_date_interval = get_optimal_daybreaks(startdate, enddate)
+    plt = plot_from_dataframe(
+        plotdf,
+        "TimeStamp",
+        "Value",
+        "plot",
+        plot_date_interval,
+        title=plottitle
     )

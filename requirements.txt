@@ -5,3 +5,6 @@ pandas
 numpy
 lppl
 python-dotenv
+plotnine
+mizani
+boto3
