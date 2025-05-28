@@ -27,3 +27,5 @@ class SymbolsCorrelationResult(BaseModel):
     std2: float
     covariance: float
     correlation: float
+    startdate: date
+    enddate: date

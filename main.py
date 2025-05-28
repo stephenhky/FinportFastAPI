@@ -111,5 +111,7 @@ def estimate_symbols_correlation(
         std1=sqrt(covmat[0, 0]),
         std2=sqrt(covmat[1, 1]),
         covariance=covmat[1, 0],
-        correlation=covmat[1, 0] / sqrt(covmat[0, 0] * covmat[1, 1])
+        correlation=covmat[1, 0] / sqrt(covmat[0, 0] * covmat[1, 1]),
+        startdate=startdate,
+        enddate=enddate
     )
