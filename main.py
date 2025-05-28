@@ -9,9 +9,14 @@ from fastapi import FastAPI
 from finsim.estimate.fit import fit_BlackScholesMerton_model, fit_multivariate_BlackScholesMerton_model
 from finsim.estimate.risk import estimate_downside_risk, estimate_upside_risk, estimate_beta
 from lppl.fit import LPPLModel
+from dotenv import load_dotenv
 
 from helpers.data import waiting_get_yahoofinance_data
 from apischemas.schemas import SymbolEstimationResult, SymbolsCorrelationResult, LPPLCrashModelResult, FittedLPPLModelParameters
+
+
+# load additional environment variables
+load_dotenv()
 
 
 # starting FastAPI app
