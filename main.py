@@ -1,8 +1,10 @@
 
 import logging
+import os
 from math import sqrt
 from datetime import datetime, timedelta
 from typing import Union
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -14,12 +16,15 @@ from lppl.fit import LPPLModel
 from dotenv import load_dotenv
 
 from helpers.data import waiting_get_yahoofinance_data
+from helpers.utils import generate_timestr_filename
 from helpers.plots import plot_from_dataframe, get_optimal_daybreaks
+from helpers.aws import copy_file_to_s3
 from apischemas.schemas import SymbolEstimationResult, SymbolsCorrelationResult, LPPLCrashModelResult, FittedLPPLModelParameters
 
 
 # load additional environment variables
 load_dotenv()
+public_s3_bucket = os.environ.get('PUBLIC_S3_BUCKET')
 
 
 # starting FastAPI app
@@ -164,6 +169,7 @@ def plot_moving_averages(
         dayswindow: Union[int, list[int]],
         plottitle: str=None
 ):
+    timestr_filename = generate_timestr_filename()
     df = waiting_get_yahoofinance_data(symbol, startdate, enddate)
     if isinstance(dayswindow, int):
         dayswindow = [dayswindow]
@@ -196,4 +202,28 @@ def plot_moving_averages(
         "plot",
         plot_date_interval,
         title=plottitle
+    )
+    plt.save(Path("/") / "tmp" / f"{timestr_filename}.png")
+    plot_response = copy_file_to_s3(
+        Path("/") / "tmp" / f"{timestr_filename}.png",
+        public_s3_bucket,
+        f"{timestr_filename}.png"
+    )
+
+    # generate Excel
+    outputdf = df[['TimeStamp', 'Close']]
+    outputdf = outputdf.rename(columns={'Close': 'Price'})
+    for daywindow, madf in madfs.items():
+        outputdf = pd.merge(outputdf, madf, on='TimeStamp')
+        outputdf = outputdf.rename(columns={'MA': '{}-day Moving Average'.format(daywindow)})
+    outputdf['TimeStamp'] = outputdf['TimeStamp'].map(lambda ts: ts.date().strftime('%Y-%m-%d'))
+    outputdf = outputdf.rename(columns={'TimeStamp': 'Date'})
+    outputdf.to_excel(
+        Path("/") / "tmp" / f"{timestr_filename}.xlsx",
+        engine='openpyxl'
+    )
+    excel_response = copy_file_to_s3(
+        Path("/") / "tmp" / f"{timestr_filename}.xlsx",
+        public_s3_bucket,
+        f"{timestr_filename}.xlsx"
     )
