@@ -1,15 +1,17 @@
 
 import logging
 from math import sqrt
+from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI
 from finsim.estimate.fit import fit_BlackScholesMerton_model, fit_multivariate_BlackScholesMerton_model
 from finsim.estimate.risk import estimate_downside_risk, estimate_upside_risk, estimate_beta
+from lppl.fit import LPPLModel
 
 from helpers.data import waiting_get_yahoofinance_data
-from apischemas.schemas import SymbolEstimationResult, SymbolsCorrelationResult
+from apischemas.schemas import SymbolEstimationResult, SymbolsCorrelationResult, LPPLCrashModelResult, FittedLPPLModelParameters
 
 
 # starting FastAPI app
@@ -27,15 +29,14 @@ def estimate_symbol_info(
         symbol: str,
         startdate: str,
         enddate: str,
-        waittime: int,
         index: str='^GSPC'    # i.e., S&P 500 index as the base for calculating beta
 ):
     # getting stock data
-    symdf = waiting_get_yahoofinance_data(symbol, startdate, enddate, waittime=waittime)
+    symdf = waiting_get_yahoofinance_data(symbol, startdate, enddate)
     print("Number of lines: {}".format(len(symdf)))
 
     # getting index
-    indexdf = waiting_get_yahoofinance_data(index, startdate, enddate, waittime=waittime)
+    indexdf = waiting_get_yahoofinance_data(index, startdate, enddate)
 
     # estimation
     isrownull = symdf['Close'].isnull()
@@ -114,4 +115,34 @@ def estimate_symbols_correlation(
         correlation=covmat[1, 0] / sqrt(covmat[0, 0] * covmat[1, 1]),
         startdate=startdate,
         enddate=enddate
+    )
+
+@app.get("/v0/predict-crash", response_model=LPPLCrashModelResult)
+def predict_crash(
+        symbol: str="^GSPC",   # default to be S&P 500
+        startdate: str=None,
+        enddate: str=None
+):
+    if startdate is None:
+        startdate = (datetime.today() - timedelta(days=365)).strftime('%Y-%m-%d')
+    if enddate is None:
+        enddate = datetime.today().strftime('%Y-%m-%d')
+
+    # get symbols
+    symdf = waiting_get_yahoofinance_data(symbol, startdate, enddate)
+
+    # fitting
+    fitted_lppl_model = LPPLModel()
+    fitted_lppl_model.tcgap = 60 * 60 * 24
+    fitted_lppl_model.fit(symdf['TimeStamp'].map(lambda ts: ts.timestamp()), symdf['Close'])
+
+    # gathering output
+    model_parameters = fitted_lppl_model.dump_model_parameters()
+    return LPPLCrashModelResult(
+        symbol=symbol,
+        startdate=startdate,
+        enddate=enddate,
+        estimated_crash_date=pd.Timestamp.fromtimestamp(model_parameters['tc']).strftime('%Y-%m-%d'),
+        estimated_crash_time=str(pd.Timestamp.fromtimestamp(model_parameters['tc'])),
+        model_parameters=FittedLPPLModelParameters(**model_parameters)
     )

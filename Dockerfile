@@ -7,6 +7,7 @@ ADD . /code
 WORKDIR /code
 
 # install python
+RUN pip install -U pip
 RUN pip install -r requirements.txt
 
 # Launch the Uvicorn web server and run the application

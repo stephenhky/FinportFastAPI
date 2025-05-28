@@ -1,5 +1,5 @@
 
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict
 
@@ -29,3 +29,23 @@ class SymbolsCorrelationResult(BaseModel):
     correlation: float
     startdate: date
     enddate: date
+
+
+class FittedLPPLModelParameters(BaseModel):
+    tc: float
+    m: float
+    omega: float
+    A: float
+    B: float
+    C: float
+    phi: float
+
+
+class LPPLCrashModelResult(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    symbol: str
+    startdate: date
+    enddate: date
+    estimated_crash_date: date
+    estimated_crash_time: datetime
+    model_parameters: FittedLPPLModelParameters

@@ -3,3 +3,4 @@ fastapi
 finsim>=1.0.5
 pandas
 numpy
+lppl
