@@ -8,3 +8,4 @@ python-dotenv
 plotnine
 mizani
 boto3
+openpyxl
