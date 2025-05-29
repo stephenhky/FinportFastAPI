@@ -12,6 +12,7 @@ from fastapi import FastAPI
 from finsim.estimate.fit import fit_BlackScholesMerton_model, fit_multivariate_BlackScholesMerton_model
 from finsim.estimate.risk import estimate_downside_risk, estimate_upside_risk, estimate_beta
 from finsim.tech.ma import get_movingaverage_price_data
+from finsim.portfolio import DynamicPortfolioWithDividends
 from lppl.fit import LPPLModel
 from dotenv import load_dotenv
 
@@ -163,13 +164,12 @@ def predict_crash(
     )
 
 
-@app.get("/v0/plot-ma", response_model=None)
+@app.get("/v0/plot-ma", response_model=PlotResponse)
 def plot_moving_averages(
         symbol: str,
         startdate: str,
         enddate: str,
-        dayswindow: Union[int, list[int]],
-        plottitle: str=None
+        dayswindow: Union[int, list[int]]
 ):
     timestr_filename = generate_timestr_filename()
     df = waiting_get_yahoofinance_data(symbol, startdate, enddate)
@@ -200,10 +200,10 @@ def plot_moving_averages(
     plt = plot_from_dataframe(
         plotdf,
         "TimeStamp",
-        "Value",
+        "value",
         "plot",
         plot_date_interval,
-        title=plottitle
+        title=symbol
     )
     plt.save(Path("/") / "tmp" / f"{timestr_filename}.png")
     plot_response = copy_file_to_s3(
@@ -236,4 +236,61 @@ def plot_moving_averages(
     )
 
 
-# plot price + dividend
+@app.get("/v0/plot-stock-with-dividends", response_model=PlotResponse)
+def plot_stock_with_dividends(
+        symbol: str,
+        startdate: str,
+        enddate: str
+):
+    timestr_filename = generate_timestr_filename()
+    portfolio = DynamicPortfolioWithDividends(
+        {symbol: 1},
+        startdate
+    )
+    portfolio.move_cursor_to_date(enddate)
+    worthdf = portfolio.get_portfolio_values_overtime(startdate, enddate)
+    plotdf = pd.concat([
+        pd.DataFrame({
+            'TimeStamp': worthdf['TimeStamp'],
+            'value': worthdf['stock_value'],
+            'plot': 'stock price'}),
+        pd.DataFrame({
+            'TimeStamp': worthdf['TimeStamp'],
+            'value': worthdf['value'],
+            'plot': 'stock price+dividend'
+        })
+    ])
+
+    # plot
+    plot_date_interval = get_optimal_daybreaks(startdate, enddate)
+    plt = plot_from_dataframe(
+        plotdf,
+        "TimeStamp",
+        "value",
+        "plot",
+        plot_date_interval,
+        title=symbol
+    )
+    plt.save(Path("/") / "tmp" / f"{timestr_filename}.png")
+    plot_response = copy_file_to_s3(
+        Path("/") / "tmp" / f"{timestr_filename}.png",
+        public_s3_bucket,
+        f"{timestr_filename}.png"
+    )
+
+    # spreadsheet
+    worthdf.to_excel(
+        Path("/") / "tmp" / f"{timestr_filename}.xlsx",
+        index=False,
+        engine='openpyxl'
+    )
+    excel_response = copy_file_to_s3(
+        Path("/") / "tmp" / f"{timestr_filename}.xlsx",
+        public_s3_bucket,
+        f"{timestr_filename}.xlsx"
+    )
+
+    return PlotResponse(
+        plot=plot_response,
+        spreadsheet=excel_response
+    )
