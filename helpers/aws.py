@@ -18,5 +18,5 @@ def copy_file_to_s3(
     return S3UploadResponse(
         filename=filepath if isinstance(filepath, str) else filepath.as_posix(),
         url=f"https://{s3_bucket}.s3.amazonaws.com/{target_filename}",
-        # boto3_response=response
+        boto3_response=response
     )
