@@ -32,7 +32,6 @@ class SymbolsCorrelationResult(BaseModel):
 
 
 class FittedLPPLModelParameters(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
     tc: float
     m: float
     omega: float
@@ -53,7 +52,6 @@ class LPPLCrashModelResult(BaseModel):
 
 
 class S3UploadResponse:
-    model_config = ConfigDict(from_attributes=True)
     filename: str
     url: str
 
