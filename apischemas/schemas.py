@@ -57,7 +57,6 @@ class S3UploadResponse:
     model_config = ConfigDict(from_attributes=True)
     filename: str
     url: str
-    boto3_response: dict[str, Any]
 
 
 class PlotResponse(BaseModel):
