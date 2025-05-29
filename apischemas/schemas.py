@@ -1,5 +1,6 @@
 
 from datetime import date, datetime
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -51,9 +52,10 @@ class LPPLCrashModelResult(BaseModel):
     model_parameters: FittedLPPLModelParameters
 
 
-class S3UploadResponse:
+class S3UploadResponse(BaseModel):
     filename: str
     url: str
+    boto3_response: dict[str, Any]
 
 
 class PlotResponse(BaseModel):
