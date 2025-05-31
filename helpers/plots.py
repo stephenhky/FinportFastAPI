@@ -29,7 +29,7 @@ def plot_from_dataframe(
 ) -> ggplot:
     plt = (ggplot(df)
            + geom_line(aes(date_field, price_field, color=color_field, group=1))
-           + theme(axis_test_x=element_text(rotation=90, hjust=1))
+           + theme(axis_text_x=element_text(rotation=90, hjust=1))
            + scale_x_datetime(breaks=date_breaks(daybreaks))
            + labs(x='Date', y='Value'))
     if title is not None:
