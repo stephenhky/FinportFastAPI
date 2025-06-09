@@ -172,10 +172,12 @@ def plot_moving_averages(
         symbol: str,
         startdate: str,
         enddate: str,
-        dayswindow: list[int]
+        dayswindow: list[int] = None
 ):
     timestr_filename = generate_timestr_filename()
     df = waiting_get_yahoofinance_data(symbol, startdate, enddate)
+    if dayswindow is None:
+        dayswindow = [50, 200]
     if isinstance(dayswindow, int):
         dayswindow = [dayswindow]
     madfs = {
