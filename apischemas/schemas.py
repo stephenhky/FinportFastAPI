@@ -55,7 +55,6 @@ class LPPLCrashModelResult(BaseModel):
 class S3UploadResponse(BaseModel):
     filename: str
     url: str
-    boto3_response: dict[str, Any]
 
 
 class PlotResponse(BaseModel):

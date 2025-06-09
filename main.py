@@ -3,7 +3,6 @@ import logging
 import os
 from math import sqrt
 from datetime import datetime, timedelta
-from typing import Union
 from pathlib import Path
 
 import numpy as np
@@ -173,7 +172,7 @@ def plot_moving_averages(
         symbol: str,
         startdate: str,
         enddate: str,
-        dayswindow: Union[int, list[int]]
+        dayswindow: list[int]
 ):
     timestr_filename = generate_timestr_filename()
     df = waiting_get_yahoofinance_data(symbol, startdate, enddate)
