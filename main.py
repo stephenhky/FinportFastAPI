@@ -15,6 +15,7 @@ from finsim.tech.ma import get_movingaverage_price_data
 from finsim.portfolio import DynamicPortfolioWithDividends
 from lppl.fit import LPPLModel
 from dotenv import load_dotenv
+import matplotlib
 
 from helpers.data import waiting_get_yahoofinance_data
 from helpers.utils import generate_timestr_filename
@@ -28,6 +29,9 @@ from apischemas.schemas import (SymbolEstimationResult, SymbolsCorrelationResult
 # load additional environment variables
 load_dotenv()
 public_s3_bucket = os.environ.get('PUBLIC_S3_BUCKET')
+
+# not using interactive web interface for matplotlib
+matplotlib.use('agg')
 
 
 # starting FastAPI app
