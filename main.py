@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from finsim.estimate.fit import fit_BlackScholesMerton_model, fit_multivariate_BlackScholesMerton_model
 from finsim.estimate.risk import estimate_downside_risk, estimate_upside_risk, estimate_beta
 from finsim.tech.ma import get_movingaverage_price_data
@@ -172,7 +172,7 @@ def plot_moving_averages(
         symbol: str,
         startdate: str,
         enddate: str,
-        dayswindow: list[int] = None
+        dayswindow: list[int] = Query(None)
 ):
     timestr_filename = generate_timestr_filename()
     df = waiting_get_yahoofinance_data(symbol, startdate, enddate)
