@@ -18,7 +18,7 @@ import matplotlib
 
 from helpers.data import waiting_get_yahoofinance_data
 from helpers.utils import generate_timestr_filename
-from helpers.plots import plot_from_dataframe, get_optimal_daybreaks
+from helpers.plots import plot_from_dataframe, get_optimal_daybreaks, plot_from_dataframe_group1
 from helpers.aws import copy_file_to_s3
 from apischemas.schemas import (SymbolEstimationResult, SymbolsCorrelationResult,
                                 LPPLCrashModelResult, FittedLPPLModelParameters,
@@ -262,13 +262,13 @@ def plot_stock_with_dividends(
         pd.DataFrame({
             'TimeStamp': worthdf['TimeStamp'],
             'value': worthdf['value'],
-            'plot': 'stock price+dividend'
+            'plot': 'with dividend'
         })
     ])
 
     # plot
     plot_date_interval = get_optimal_daybreaks(startdate, enddate)
-    plt = plot_from_dataframe(
+    plt = plot_from_dataframe_group1(
         plotdf,
         "TimeStamp",
         "value",

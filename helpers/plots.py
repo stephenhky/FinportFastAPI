@@ -28,6 +28,24 @@ def plot_from_dataframe(
         title: str=None
 ) -> ggplot:
     plt = (ggplot(df)
+           + geom_line(aes(date_field, price_field, color=color_field))
+           + theme(axis_text_x=element_text(rotation=90, hjust=1))
+           + scale_x_datetime(breaks=date_breaks(daybreaks))
+           + labs(x='Date', y='Value'))
+    if title is not None:
+        plt += ggtitle(title)
+    return plt
+
+
+def plot_from_dataframe_group1(
+        df: pd.DataFrame,
+        date_field: str,
+        price_field: str,
+        color_field: str,
+        daybreaks: str,
+        title: str=None
+) -> ggplot:
+    plt = (ggplot(df)
            + geom_line(aes(date_field, price_field, color=color_field, group=1))
            + theme(axis_text_x=element_text(rotation=90, hjust=1))
            + scale_x_datetime(breaks=date_breaks(daybreaks))
