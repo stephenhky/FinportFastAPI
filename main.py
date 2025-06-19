@@ -8,6 +8,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, Query
+from mangum import Mangum
+import uvicorn
 from finsim.estimate.fit import fit_BlackScholesMerton_model, fit_multivariate_BlackScholesMerton_model
 from finsim.estimate.risk import estimate_downside_risk, estimate_upside_risk, estimate_beta
 from finsim.tech.ma import get_movingaverage_price_data
@@ -35,6 +37,7 @@ matplotlib.use('agg')
 
 # starting FastAPI app
 app = FastAPI()
+handler = Mangum(app)
 
 
 # root, health check
@@ -301,4 +304,8 @@ def plot_stock_with_dividends(
     )
 
 
-# for deployment, refer to: https://medium.com/aspiring-data-scientist/deploy-a-fastapi-app-on-aws-ecs-034b8b7b5ac2
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+# for deployment, refer to: https://blog.searce.com/fastapi-container-app-deployment-using-aws-lambda-and-api-gateway-6721904531d0

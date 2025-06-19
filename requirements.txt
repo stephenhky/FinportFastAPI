@@ -10,3 +10,4 @@ plotnine
 mizani
 boto3
 openpyxl
+mangum
