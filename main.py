@@ -299,3 +299,6 @@ def plot_stock_with_dividends(
         plot=plot_response,
         spreadsheet=excel_response
     )
+
+
+# for deployment, refer to: https://medium.com/aspiring-data-scientist/deploy-a-fastapi-app-on-aws-ecs-034b8b7b5ac2
