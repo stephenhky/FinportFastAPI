@@ -22,4 +22,4 @@ RUN pip install awslambdaric boto3
 # Launch the Uvicorn web server and run the application
 #CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
 ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
-CMD [ "app.handler" ]
+CMD [ "finport_fastapi.handler" ]
