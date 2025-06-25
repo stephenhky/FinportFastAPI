@@ -309,3 +309,4 @@ if __name__ == "__main__":
 
 
 # for deployment, refer to: https://blog.searce.com/fastapi-container-app-deployment-using-aws-lambda-and-api-gateway-6721904531d0
+# for calling, refer to: https://stackoverflow.com/questions/78094087/how-do-i-correctly-route-fastapi-on-aws-lambda-using-mangum-to-avoid-a-not-foun
