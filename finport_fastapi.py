@@ -37,7 +37,11 @@ matplotlib.use('agg')
 
 # starting FastAPI app
 app = FastAPI()
-handler = Mangum(app)
+handler = Mangum(
+    app,
+    lifespan="off",
+    api_gateway_base_path=os.environ.get('API_GATEWAY_ROOT_PATH')
+)
 
 
 # root, health check
