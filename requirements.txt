@@ -11,3 +11,5 @@ mizani
 boto3
 openpyxl
 mangum
+requests
+requests-aws4auth
