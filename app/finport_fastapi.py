@@ -18,11 +18,11 @@ from lppl.fit import LPPLModel
 from dotenv import load_dotenv
 import matplotlib
 
-from helpers.data import waiting_get_yahoofinance_data
-from helpers.utils import generate_timestr_filename
-from helpers.plots import plot_from_dataframe, get_optimal_daybreaks, plot_from_dataframe_group1
-from helpers.aws import copy_file_to_s3
-from apischemas.schemas import (SymbolEstimationResult, SymbolsCorrelationResult,
+from .helpers.data import waiting_get_yahoofinance_data
+from .helpers.utils import generate_timestr_filename
+from .helpers.plots import plot_from_dataframe, get_optimal_daybreaks, plot_from_dataframe_group1
+from .helpers.aws import copy_file_to_s3
+from .apischemas.schemas import (SymbolEstimationResult, SymbolsCorrelationResult,
                                 LPPLCrashModelResult, FittedLPPLModelParameters,
                                 PlotResponse)
 
