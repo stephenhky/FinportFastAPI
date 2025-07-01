@@ -36,7 +36,7 @@ matplotlib.use('agg')
 
 
 # starting FastAPI app
-app = FastAPI()
+app = FastAPI(root_path=os.environ.get('FASTAPI_ROOT_PATH'))
 handler = Mangum(
     app,
     lifespan="off",
