@@ -1,9 +1,9 @@
 
-import logging
 import os
 from math import sqrt
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -17,6 +17,7 @@ from finsim.portfolio import DynamicPortfolioWithDividends
 from lppl.fit import LPPLModel
 from dotenv import load_dotenv
 import matplotlib
+from loguru import logger
 
 from .helpers.data import waiting_get_yahoofinance_data
 from .helpers.utils import generate_timestr_filename
@@ -89,7 +90,7 @@ def estimate_symbol_info(
             mgdf['Close_x'].to_numpy()
         )
     except:
-        logging.warning('Index {} failed to be integrated.'.format(index))
+        logger.warning('Index {} failed to be integrated.'.format(index))
         beta = None
 
     return SymbolEstimationResult(
@@ -146,8 +147,8 @@ def estimate_symbols_correlation(
 @app.get("/v0/predict-crash", response_model=LPPLCrashModelResult)
 def predict_crash(
         symbol: str="^GSPC",   # default to be S&P 500
-        startdate: str=None,
-        enddate: str=None
+        startdate: Optional[str]=None,
+        enddate: Optional[str]=None
 ):
     if startdate is None:
         startdate = (datetime.today() - timedelta(days=365)).strftime('%Y-%m-%d')
@@ -179,7 +180,7 @@ def plot_moving_averages(
         symbol: str,
         startdate: str,
         enddate: str,
-        dayswindow: list[int] = Query(None)
+        dayswindow: Optional[list[int]] = Query(None)
 ):
     timestr_filename = generate_timestr_filename()
     df = waiting_get_yahoofinance_data(symbol, startdate, enddate)
