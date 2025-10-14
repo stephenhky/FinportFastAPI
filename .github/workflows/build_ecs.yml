@@ -1,9 +1,7 @@
 name: Build and Push Docker Image to AWS ECR
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest
