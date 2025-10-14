@@ -1,0 +1,20 @@
+name: Build and Push Docker Image to AWS ECR
+on:
+  push:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v3
+        with:
+          platforms: linux/arm64
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ vars.ECR_URL }}
+      - run: docker build -t ${{ vars.ECR_NAME }} .
+      - run: docker tag "${{ vars.ECR_NAME }}:latest" "${{ vars.ECR_URL }}/${{ vars.ECR_NAME }}:latest"
+      - run: docker push "${{ vars.ECR_URL }}/${{ vars.ECR_NAME }}:latest"
