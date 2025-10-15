@@ -218,7 +218,7 @@ def plot_moving_averages(
         plot_date_interval,
         title=symbol
     )
-    plt.save(Path("/") / "tmp" / f"{timestr_filename}.png")
+    plt.save(filename=(Path("/") / "tmp" / f"{timestr_filename}.png"))
     plot_response = copy_file_to_s3(
         Path("/") / "tmp" / f"{timestr_filename}.png",
         public_s3_bucket,
