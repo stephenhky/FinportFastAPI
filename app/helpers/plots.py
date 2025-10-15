@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pandas as pd
 from plotnine import ggplot, aes, geom_line, theme, element_text, scale_x_datetime, labs, ggtitle
-from mizani.breaks import date_breaks
+from mizani.breaks import breaks_date_width
 
 
 def get_optimal_daybreaks(startdate: str, enddate: str) -> str:
@@ -30,7 +30,7 @@ def plot_from_dataframe(
     plt = (ggplot(df)
            + geom_line(aes(date_field, price_field, color=color_field))
            + theme(axis_text_x=element_text(rotation=90, hjust=1))
-           + scale_x_datetime(breaks=date_breaks(daybreaks))
+           + scale_x_datetime(breaks=breaks_date_width(daybreaks))
            + labs(x='Date', y='Value'))
     if title is not None:
         plt += ggtitle(title)
