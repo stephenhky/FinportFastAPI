@@ -48,7 +48,7 @@ def plot_from_dataframe_group1(
     plt = (ggplot(df)
            + geom_line(aes(date_field, price_field, color=color_field, group=1))
            + theme(axis_text_x=element_text(rotation=90, hjust=1))
-           + scale_x_datetime(breaks=date_breaks(daybreaks))
+           + scale_x_datetime(breaks=breaks_date_width(daybreaks))
            + labs(x='Date', y='Value'))
     if title is not None:
         plt += ggtitle(title)
